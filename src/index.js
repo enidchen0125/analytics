@@ -6,6 +6,7 @@ import { dashboardPage, installPage, loginPage, messagePage, newSitePage, sitesP
 import { addSite, cleanDomain, listDomains, ownerOf } from './sites.js';
 import { bearerLogin, createToken, listTokens, revokeToken } from './tokens.js';
 import { mcpResponse } from './mcp.js';
+import { publicFile } from './public-files.js';
 
 export { cleanDomain };
 
@@ -35,7 +36,8 @@ export async function handle(request, env) {
     return new Response(null, { status: 405, headers: CORS });
   }
   if (path === '/health') return json(200, { ok: true });
-  if (path === '/robots.txt') return new Response('User-agent: *\nDisallow: /\n', { headers: { 'content-type': 'text/plain' } });
+  const file = publicFile(path, method, env.PUBLIC_ORIGIN || url.origin);
+  if (file) return file;
 
   if (path === '/auth/login') {
     const state = crypto.randomUUID();
